@@ -116,6 +116,7 @@ if (( ${+functions[git-info]} )); then
   autoload -Uz add-zsh-hook && add-zsh-hook precmd git-info
 fi
 
+VIRTUAL_ENV_DISABLE_PROMPT=1
 #RPROMPT='$(prompt_end)' # Right side of the terminal
 PS1='$(_prompt_main)' # left side of the terminal
 unset RPS1
