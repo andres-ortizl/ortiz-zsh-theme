@@ -54,9 +54,9 @@ function prompt_status() {
   if (( $(jobs -l | wc -l) )) segment+=' %F{cyan}⚙ ' # jobs pending
   if (( RANGER_LEVEL )) segment+=' %F{cyan}r'
   if [[ -n ${VIRTUAL_ENV} ]] && [[ ${FULL_PATH_VIRTUAL_ENV} = 1 ]] segment+="%F{cyan}${VIRTUAL_ENV:t}${SEP}" # virtualenv
-  if [[ -n ${VIRTUAL_ENV} ]] && [[ ${FULL_PATH_VIRTUAL_ENV} = 0 ]] segment+="%F{cyan}venv${SEP}" # virtualenv
+  if [[ -n ${VIRTUAL_ENV} ]] && [[ ${FULL_PATH_VIRTUAL_ENV} = 0 ]] segment+="%F{cyan}🐍${SEP}" # virtualenv
   if [[ -n ${SSH_TTY} ]] segment+=" %F{%(!.yellow.default)}%n@%m"
-  if [[ -n ${KUBECONFIG} ]] segment+="%F{$KUBERNETES_COLOR_PROMPT} \u2388 `kubectx -c`\u0488`kubens -c`${SEP}" # kubernetes ctx
+  if [[ -n ${KUBECONFIG} ]] segment+="%F{$KUBERNETES_COLOR_PROMPT} \u2388 `kubectx -c` \u0488 `kubens -c`${SEP}" # kubernetes ctx
   if [[ -n ${segment} ]]; then
     prompt_standout_segment ${STATUS_COLOR} "${segment}"
   fi
