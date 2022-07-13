@@ -8,17 +8,25 @@ export CLEAN_COLOR=191
 export SEP='%F{051} \u00A6' # https://en.wikipedia.org/wiki/List_of_Unicode_characters
 export FULL_PATH_VIRTUAL_ENV=0
 export KUBERNETES_COLOR_PROMPT=033
+export PURPLE_COLOR=200
 
 function _prompt_main() {
   # This runs in a subshell
   RETVAL=${?}
   prompt_status
+  prompt_arch
   prompt_pwd
   prompt_git
   prompt_time
   prompt_cmd_line
 }
 
+function prompt_arch(){
+  arch=$(uname -m)
+  if [[ ${arch} != "arm64" ]]; then
+    prompt_standout_segment ${PURPLE_COLOR} " ${arch}"
+  fi
+}
 
 function prompt_pwd() {
   local current_dir=${(%):-%~}
@@ -75,6 +83,7 @@ function prompt_end(){
 function print_available_colors(){
   for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done
 }
+
 
 function prompt_cmd_line(){
   #ツ
