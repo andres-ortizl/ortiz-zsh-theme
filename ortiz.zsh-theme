@@ -19,10 +19,6 @@ function _prompt_main() {
   prompt_cmd_line
 }
 
-function preexec() {
-  # executed every time we run a command
-  timer=$(date +%s%3N)
-}
 
 function prompt_pwd() {
   local current_dir=${(%):-%~}
@@ -63,25 +59,7 @@ function prompt_status() {
 }
 
 function prompt_time() {
-  # elapsed cmd time
-    if [ $timer ]; then
-      local now=$(date +%s%3N)
-      local d_ms=$(($now-$timer))
-      local d_s=$((d_ms / 1000))
-      local ms=$((d_ms % 1000))
-      local s=$((d_s % 60))
-      local m=$(((d_s / 60) % 60))
-      local h=$((d_s / 3600))
-      if ((h > 0)); then elapsed=${h}h${m}m
-      elif ((m > 0)); then elapsed=${m}m${s}s
-      elif ((s >= 10)); then elapsed=${s}.$((ms / 100))s
-      elif ((s > 0)); then elapsed=${s}.$((ms / 10))s
-      else elapsed=${ms}ms
-      fi
-      prompt_standout_segment ${PWD_COLOR} " ${elapsed}"
-      unset timer
-    fi
-
+  prompt_standout_segment ${PWD_COLOR} " ${duration_info} "
 }
 
 function prompt_standout_segment() {
@@ -117,6 +95,17 @@ if (( ${+functions[git-info]} )); then
 fi
 
 VIRTUAL_ENV_DISABLE_PROMPT=1
+
+
 #RPROMPT='$(prompt_end)' # Right side of the terminal
+setopt nopromptbang prompt{cr,percent,sp,subst}
+
+zstyle ':zim:duration-info' threshold 0.1
+zstyle ':zim:duration-info' format '%d '
+zstyle ':zim:duration-info' show-milliseconds yes
+
+autoload -Uz add-zsh-hook
+add-zsh-hook preexec duration-info-preexec
+add-zsh-hook precmd duration-info-precmd
 PS1='$(_prompt_main)' # left side of the terminal
 unset RPS1
