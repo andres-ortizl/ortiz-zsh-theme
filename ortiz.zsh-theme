@@ -5,10 +5,12 @@ export STATUS_COLOR=140
 export PWD_COLOR=140
 export DIRTY_COLOR=220
 export CLEAN_COLOR=191
-export SEP='%F{051} \u00A6' # https://en.wikipedia.org/wiki/List_of_Unicode_characters
+export SEP='%F{051} ▲' # https://en.wikipedia.org/wiki/List_of_Unicode_characters
 export FULL_PATH_VIRTUAL_ENV=0
 export KUBERNETES_COLOR_PROMPT=033
 export PURPLE_COLOR=200
+export SHOW_ARCH=0
+export GREEN_COLOR=120
 
 function _prompt_main() {
   # This runs in a subshell
@@ -22,10 +24,13 @@ function _prompt_main() {
 }
 
 function prompt_arch(){
-  arch=$(uname -m)
-  if [[ ${arch} != "arm64" ]]; then
-    prompt_standout_segment ${PURPLE_COLOR} " ${arch}"
+  if [[ $SHOW_ARCH -eq 1 ]]; then
+    arch=$(uname -m)
+    if [[ ${arch} != "arm64" ]]; then
+        prompt_standout_segment ${PURPLE_COLOR} " ${arch}"
+    fi
   fi
+
 }
 
 function prompt_pwd() {
@@ -45,6 +50,7 @@ function prompt_git() {
     else
       git_color=${CLEAN_COLOR}
     fi
+    echo -n "${SEP}"
     prompt_standout_segment ${git_color} " ${(e)git_info[prompt]}${git_dirty}"
   fi
 }
@@ -54,20 +60,21 @@ function prompt_git() {
 function prompt_status() {
   local segment=''
   if (( RETVAL )) segment+=' %F{red}✘ ' # failed cmd
-  if (( EUID == 0 )) segment+=' %F{yellow}⚡ ' # sudo user
+  if (( RETVAL == 0)) segment+=' %F{120}✔️ ' # success cmd
+  if (( EUID == 0 )) segment+=' %F{yellow}☠ ' # sudo user
   if (( $(jobs -l | wc -l) )) segment+=' %F{cyan}⚙ ' # jobs pending
   if (( RANGER_LEVEL )) segment+=' %F{cyan}r'
   if [[ -n ${VIRTUAL_ENV} ]] && [[ ${FULL_PATH_VIRTUAL_ENV} = 1 ]] segment+="%F{cyan}${VIRTUAL_ENV:t}${SEP}" # virtualenv
-  if [[ -n ${VIRTUAL_ENV} ]] && [[ ${FULL_PATH_VIRTUAL_ENV} = 0 ]] segment+="%F{cyan}🐍${SEP}" # virtualenv
+  if [[ -n ${VIRTUAL_ENV} ]] && [[ ${FULL_PATH_VIRTUAL_ENV} = 0 ]] segment+="%F{cyan} §env${SEP}" # virtualenv
   if [[ -n ${SSH_TTY} ]] segment+=" %F{%(!.yellow.default)}%n@%m"
-  if [[ -n ${KUBECONFIG} ]] segment+="%F{$KUBERNETES_COLOR_PROMPT} \u2388 `kubectx -c` \u0488 `kubens -c`${SEP}" # kubernetes ctx
+  if [[ -n ${KUBECONFIG} ]] segment+="%F{$KUBERNETES_COLOR_PROMPT} `kubectx -c` \u2388 `kubens -c`${SEP}" # kubernetes ctx
   if [[ -n ${segment} ]]; then
     prompt_standout_segment ${STATUS_COLOR} "${segment}"
   fi
 }
 
 function prompt_time() {
-  prompt_standout_segment ${PWD_COLOR} " ${duration_info} "
+  prompt_standout_segment ${GREEN_COLOR} " ${duration_info}"
 }
 
 function prompt_standout_segment() {
@@ -86,7 +93,7 @@ function print_available_colors(){
 
 
 function prompt_cmd_line(){
-  #ツ
+
   print -n "\n%F{${STATUS_COLOR}}⟫ "
 
 }
